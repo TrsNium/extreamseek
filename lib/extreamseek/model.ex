@@ -1,5 +1,4 @@
 
-
 defmodule ExtreamSeek.Dir do
   defstruct [:dir_name, :depth]
 
@@ -17,6 +16,7 @@ defmodule ExtreamSeek.Path do
     path.is_contain
   end
 end
+
 
 defmodule ExtreamSeek.Process do
   defstruct [:pid, :completed_count, :total_count]
