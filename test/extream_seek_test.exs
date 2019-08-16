@@ -20,6 +20,7 @@ defmodule ExtreamSeekTest do
   @test_dir_data [%ExtreamSeek.Dir{dir_name: "test1", depth: 1}, %ExtreamSeek.Dir{dir_name: "test2", depth: 2}, %ExtreamSeek.Dir{dir_name: "test3", depth: 3}]
   test "test ExtreamSeek.Dir.dirs_less_than_max" do
     results = ExtreamSeek.Dir.dirs_less_than_max(@test_dir_data, 3)
-    assert results == [%ExtreamSeek.Dir{dir_name: "test1", depth: 1}, %ExtreamSeek.Dir{dir_name: "test2", depth: 2}]
+    expected = [%ExtreamSeek.Dir{dir_name: "test1", depth: 1}, %ExtreamSeek.Dir{dir_name: "test2", depth: 2}]
+    assert results == expected
   end
 end
