@@ -1,4 +1,4 @@
-defmodule Seeker do
+defmodule Extream.Seeker do
   def seek(scheduler) do
     send scheduler, {:ready, self}
     receive do
