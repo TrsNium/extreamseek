@@ -2,22 +2,30 @@ defmodule Extream.Seeker do
   def seek(scheduler) do
     send scheduler, {:ready, scheduler}
     receive do
-      {:seek, dir, words, depth} ->
-        {:ok, ls} = File.ls(dir)
-        joined_ls = ls |> Enum.map(&(Path.join([dir, &1])))
-        files = joined_ls
-                |> Enum.filter(&(!File.dir?(&1)))
-                |> Enum.filter(&(is_contains_words(&1, words)))
-        dirs = joined_ls |> Enum.filter(&(File.dir?(&1)))
-        # TODO: when return dir, use dir struct
-        send scheduler, {:result, files, {depth+1, dirs}}
+      {:seek_in_dir, dir} ->
+        {dirs, paths} = seek_in_dir(dir)
+        send scheduler, {:completed_seek_in_dir, self(), dirs, paths}
+        seek(scheduler)
+      {:seek_in_file, path, words} ->
+        result = seek_in_file(path, words)
+        send scheduler, {:completed_seek_in_file, self(), result}
+        seek(scheduler)
       {:shutdown} ->
-        exit(:boom)
+        exit(:EXIT)
     end
   end
 
-  defp is_contains_words(path, words) do
+  defp seek_in_dir(%ExtreamSeek.Dir{dir_path: dir_path, depth: depth}) do
+    {:ok, paths} = File.ls(dir_path)
+    joined_paths = paths |> Enum.map(&(Path.join([dir_path, &1])))
+    is_files = joined_paths |> Enum.filter(&(!File.dir?(&1)))
+    is_dirs = joined_paths |> Enum.filter(&(File.dir?(&1))) |> Enum.map(fn (dir_path) -> %ExtreamSeek.Dir{dir_path: dir_path, depth: depth+1} end)
+    {is_dirs, is_files}
+  end
+
+  defp seek_in_file(path, words) do
     {:ok, contents} = File.read path
-    String.contains? contents, words
+    is_contain_words = String.contains?(contents, words)
+    %ExtreamSeek.File{path: path, is_contain: is_contain_words}
   end
 end

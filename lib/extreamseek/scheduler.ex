@@ -17,10 +17,10 @@ defmodule ExtreamSeek.Scheduler do
         schedule_process processes, other_dirs, paths, words, max_depth, results
       {:ready, pid} when paths != [] ->
         {target_path, other_paths} = List.pop_at(paths, 0)
-        send pid, {:seek_in_path, target_path}
+        send pid, {:seek_in_file, target_path, words}
         schedule_process processes, dirs, other_paths, words, max_depth, results
       {:ready, pid} ->
-        send pid, {:EXIT}
+        send pid, {:shutdown}
         if length(processes) > 1 do
           schedule_process List.delete(processes, pid), [], [], words, max_depth, results
         else
