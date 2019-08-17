@@ -11,11 +11,11 @@ defmodule ExtreamSeek.Scheduler do
 
   defp schedule_process(processes, dirs, paths, words, max_depth, results \\ []) do
     receive do
-      {:ready, pid} when length(dirs) > 0 ->
+      {:ready, pid} when dirs != [] ->
         {target_dir, other_dirs} = List.pop_at(dirs, 0)
         send pid, {:seek_in_dir, target_dir}
         schedule_process processes, other_dirs, paths, words, max_depth, results
-      {:ready, pid} when length(paths) > 0 ->
+      {:ready, pid} when paths != [] ->
         {target_path, other_paths} = List.pop_at(paths, 0)
         send pid, {:seek_in_path, target_path}
         schedule_process processes, dirs, other_paths, words, max_depth, results
@@ -54,10 +54,10 @@ defmodule ExtreamSeek.Scheduler do
       # Handler when the directory has been scanned.
       # Continue scanning if there are directories less than 'max_depth'.
       # If not, look in the file.
-      {:completed_seek_in_file, pid, file} when length(dirs) > 0 ->
+      {:completed_seek_in_file, pid, file} when dirs != [] ->
         send pid, {:seek_in_dir, dirs}
         schedule_process processes, dirs, paths, words, max_depth, results ++ [file]
-      {:completed_seek_in_file, pid, file} when length(paths) > 0 ->
+      {:completed_seek_in_file, pid, file} when paths != [] ->
         [target_path| other_paths] = paths
         send pid, {:seek_in_file, target_path}
         schedule_process processes, dirs, other_paths, words, max_depth, results ++ [file]
