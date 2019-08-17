@@ -1,25 +1,29 @@
 
 defmodule ExtreamSeek.Dir do
-  defstruct [:dir_name, :depth]
+  defstruct dir_path: nil, depth: 0
 
   alias ExtreamSeek.Dir
   def dirs_less_than_max(dirs, max) do
     Enum.filter(dirs, fn (dir) -> dir.depth < max end)
   end
+
+  def convert_dirs_to_structed(dirs) do
+    dirs
+    |> Enum.map(fn(dir) -> %Dir{dir_path: dir} end)
+  end
 end
 
 
-defmodule ExtreamSeek.Path do
+defmodule ExtreamSeek.File do
   defstruct path: nil, is_contain: false
-
-  def is_contain(%ExtreamSeek.Path{} = path) do
-    path.is_contain
+  def is_contain(%ExtreamSeek.File{} = file) do
+    file.is_contain
   end
 end
 
 
 defmodule ExtreamSeek.Process do
-  defstruct [:pid, :completed_count, :total_count]
+  defstruct pid: nil, completed_count: 0, total_count: 0
   alias ExtreamSeek.Process
 
   def is_all_completed([]), do: true
