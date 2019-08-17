@@ -28,46 +28,14 @@ defmodule ExtreamSeek.Scheduler do
         end
 
       # Handler when the directory has been scanned.
-      # Continue scanning if there are directories less than 'max_depth'.
-      # If not, look in the file.
-      {:completed_seek_in_dir, pid, new_dirs, new_paths} ->
+      {:completed_seek_in_dir, _pid, new_dirs, new_paths} ->
         updated_dirs = ExtreamSeek.Dir.dirs_less_than_max(dirs ++ new_dirs, max_depth)
         updated_paths = paths ++ new_paths
-        case { length(updated_dirs) > 0, length(updated_paths) > 0} do
-          {true, _} ->
-            {target_dir, updated_dirs} = List.pop_at(updated_dirs, 0)
-            send pid, {:seek_in_dir, target_dir}
-            schedule_process processes, updated_dirs, updated_paths, words, max_depth, results
-          {_, true} ->
-            {target_path, updated_paths} = List.pop_at(updated_paths, 0)
-            send pid, {:seek_in_file, target_path}
-            schedule_process processes, updated_dirs, updated_paths, words, max_depth, results
-          {_, _} ->
-            send pid, {:EXIT}
-            if length(processes) > 1 do
-              schedule_process List.delete(processes, pid), [], [], words, max_depth, results
-            else
-              results
-            end
-        end
+        schedule_process processes, updated_dirs, updated_paths, words, max_depth, results
 
-      # Handler when the file has been scanned.
-      # Continue scanning if there are directories less than 'max_depth'.
-      # If not, look in the file.
-      {:completed_seek_in_file, pid, file} when dirs != [] ->
-        send pid, {:seek_in_dir, dirs}
+      # Handler when the directory has been scanned.
+      {:completed_seek_in_file, _pid, file} ->
         schedule_process processes, dirs, paths, words, max_depth, results ++ [file]
-      {:completed_seek_in_file, pid, file} when paths != [] ->
-        [target_path| other_paths] = paths
-        send pid, {:seek_in_file, target_path}
-        schedule_process processes, dirs, other_paths, words, max_depth, results ++ [file]
-      {:completed_seek_in_dir, pid, file} ->
-        send pid, {:EXIT}
-        if length(processes) > 1 do
-          schedule_process List.delete(processes, pid), [], [], words, max_depth, results  ++ [file]
-        else
-          results
-        end
     end
   end
 end

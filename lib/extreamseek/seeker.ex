@@ -1,6 +1,6 @@
 defmodule Extream.Seeker do
   def seek(scheduler) do
-    send scheduler, {:ready, self}
+    send scheduler, {:ready, scheduler}
     receive do
       {:seek, dir, words, depth} ->
         {:ok, ls} = File.ls(dir)
