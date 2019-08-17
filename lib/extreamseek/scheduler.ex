@@ -51,7 +51,7 @@ defmodule ExtreamSeek.Scheduler do
             end
         end
 
-      # Handler when the directory has been scanned.
+      # Handler when the file has been scanned.
       # Continue scanning if there are directories less than 'max_depth'.
       # If not, look in the file.
       {:completed_seek_in_file, pid, file} when dirs != [] ->
