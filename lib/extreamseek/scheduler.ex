@@ -61,7 +61,7 @@ defmodule ExtreamSeek.Scheduler do
         [target_path| other_paths] = paths
         send pid, {:seek_in_file, target_path}
         schedule_process processes, dirs, other_paths, words, max_depth, results ++ [file]
-			{:completed_seek_in_dir, pid, file} ->
+      {:completed_seek_in_dir, pid, file} ->
         send pid, {:EXIT}
         if length(processes) > 1 do
           schedule_process List.delete(processes, pid), [], [], words, max_depth, results  ++ [file]
