@@ -29,7 +29,7 @@ defmodule ExtreamSeek.Scheduler do
 
       # Handler when the directory has been scanned.
       {:completed_seek_in_dir, _pid, new_dirs, new_paths} ->
-        updated_dirs = ExtreamSeek.Dir.dirs_less_than_max(dirs ++ new_dirs, max_depth)
+        updated_dirs = dirs ++ ExtreamSeek.Dir.dirs_less_than_max(new_dirs, max_depth)
         updated_paths = paths ++ new_paths
         schedule_process processes, updated_dirs, updated_paths, words, max_depth, results
 
