@@ -29,8 +29,13 @@ defmodule Extream.Seeker do
   end
 
   defp seek_in_file(path, words) do
-    {:ok, contents} = File.read path
-    is_contain_words = String.contains?(contents, words)
-    %ExtreamSeek.File{path: path, is_contain: is_contain_words}
+    case File.read path do
+      {:ok, contents} ->
+        is_contain_words = String.contains?(contents, words)
+        %ExtreamSeek.File{path: path, is_contain: is_contain_words}
+      {:error, reason} ->
+        IO.puts "An error occurred in `#{path}`. the reason: #{reason}"
+        %ExtreamSeek.File{path: path, is_contain: false}
+    end
   end
 end

@@ -4,12 +4,14 @@ defmodule ExtreamSeek.Scheduler do
     structed_dirs = dirs
                     |> Enum.map(fn(dir)-> %ExtreamSeek.Dir{dir_path: dir} end)
 
-    1..process_num
+    results = 1..process_num
     |> Enum.map(fn (_) -> spawn(Extream.Seeker, :seek, [self()]) end)
     |> schedule_process(structed_dirs, [], words, max_depth)
+    IO.puts inspect results
   end
 
   defp schedule_process(processes, dirs, paths, words, max_depth, results \\ []) do
+    IO.puts length processes
     receive do
       {:ready, pid} when dirs != [] ->
         {target_dir, other_dirs} = List.pop_at(dirs, 0)
@@ -35,8 +37,10 @@ defmodule ExtreamSeek.Scheduler do
 
       # Handler when the directory has been scanned.
       {:completed_seek_in_file, _pid, file} ->
-        schedule_process processes, dirs, paths, words, max_depth, results ++ [file]
-      after 1_000_000 -> raise "Passed 1_000_000 ms.."
+        if file.is_contain do
+          schedule_process processes, dirs, paths, words, max_depth, results ++ [file]
+        end
+        schedule_process processes, dirs, paths, words, max_depth, results
     end
   end
 end
