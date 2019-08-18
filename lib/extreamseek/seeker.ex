@@ -10,7 +10,10 @@ defmodule Extream.Seeker do
         result = seek_in_file(path, words)
         send scheduler, {:completed_seek_in_file, self(), result}
         seek(scheduler)
-      {:shutdown} ->
+      :idle ->
+        :timer.sleep(10)
+        seek(scheduler)
+      :shutdown ->
         exit(:EXIT)
     end
   end
