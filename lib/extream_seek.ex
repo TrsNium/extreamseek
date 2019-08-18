@@ -1,18 +1,40 @@
 defmodule ExtreamSeek do
-  @moduledoc """
-  Documentation for ExtreamSeek.
-  """
 
-  @doc """
-  Hello world.
+  def main(argv) do
+    argv
+    |> parse_args
+    |> process
+    |> formatter
+    |> Enum.join "\n"
+    |> IO.puts
+  end
 
-  ## Examples
+  def parse_args(argv) do
+    parse = OptionParser.parse(argv, switches: [help: :boolean],
+                                     aliases: [h:     :help])
 
-      iex> ExtreamSeek.hello()
-      :world
+    case parse do
+      {[help: true], _, _}
+        -> :help
 
-  """
-  def hello do
-    :world
+      {_, [dir, word, process_num, depth], _}
+        -> { dir, word, process_num, depth }
+      _ -> :help
+    end
+  end
+
+  defp process(:help) do
+    IO.puts """
+    usage: extreamseek <dir> <word> <process_num> depth]
+    """
+  end
+
+  defp process({ dir, word, process_num, depth }) do
+    ExtreamSeek.Scheduler.run([dir], process_num, word, depth)
+  end
+
+  defp formatter(results) do
+    results
+    |> Enum.map(fn (result) -> result.path end)
   end
 end
