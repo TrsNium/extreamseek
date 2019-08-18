@@ -1,6 +1,6 @@
 defmodule Extream.Seeker do
   def seek(scheduler) do
-    send scheduler, {:ready, scheduler}
+    send scheduler, {:ready, self()}
     receive do
       {:seek_in_dir, dir} ->
         {dirs, paths} = seek_in_dir(dir)
@@ -16,11 +16,16 @@ defmodule Extream.Seeker do
   end
 
   defp seek_in_dir(%ExtreamSeek.Dir{dir_path: dir_path, depth: depth}) do
-    {:ok, paths} = File.ls(dir_path)
-    joined_paths = paths |> Enum.map(&(Path.join([dir_path, &1])))
-    is_files = joined_paths |> Enum.filter(&(!File.dir?(&1)))
-    is_dirs = joined_paths |> Enum.filter(&(File.dir?(&1))) |> Enum.map(fn (dir_path) -> %ExtreamSeek.Dir{dir_path: dir_path, depth: depth+1} end)
-    {is_dirs, is_files}
+    case File.ls(dir_path) do
+      {:ok, paths} ->
+        joined_paths = paths |> Enum.map(&(Path.join([dir_path, &1])))
+        is_files = joined_paths |> Enum.filter(&(!File.dir?(&1)))
+        is_dirs = joined_paths |> Enum.filter(&(File.dir?(&1))) |> Enum.map(fn (dir_path) -> %ExtreamSeek.Dir{dir_path: dir_path, depth: depth+1} end)
+        {is_dirs, is_files}
+      {:error, reason} ->
+        IO.puts "An error occurred in `#{dir_path}`. the reason: #{reason}"
+        {[], []}
+    end
   end
 
   defp seek_in_file(path, words) do
