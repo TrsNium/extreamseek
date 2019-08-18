@@ -4,10 +4,9 @@ defmodule ExtreamSeek.Scheduler do
     structed_dirs = dirs
                     |> Enum.map(fn(dir)-> %ExtreamSeek.Dir{dir_path: dir} end)
 
-    results = 1..process_num
+    1..process_num
     |> Enum.map(fn (_) -> %ExtreamSeek.Process{pid: spawn(Extream.Seeker, :seek, [self()])} end)
     |> schedule_process(structed_dirs, [], words, max_depth)
-    results
   end
 
   defp schedule_process(processes, dirs, paths, words, max_depth, results \\ []) do
@@ -21,8 +20,7 @@ defmodule ExtreamSeek.Scheduler do
         {target_path, other_paths} = List.pop_at(paths, 0)
         updated_processes = ExtreamSeek.Process.update_process(pid, processes, :execute)
         send pid, {:seek_in_file, target_path, words}
-        schedule_process updated_processes, dirs, other_paths, words, max_depth, results
-      {:ready, pid} ->
+        schedule_process updated_processes, dirs, other_paths, words, max_depth, results {:ready, pid} ->
         case ExtreamSeek.Process.is_all_completed(processes) do
           true ->
             send pid, :shutdown
@@ -48,7 +46,7 @@ defmodule ExtreamSeek.Scheduler do
         updated_processes = ExtreamSeek.Process.update_process(pid, processes, :completed)
         case file.is_contain do
           true -> schedule_process updated_processes, dirs, paths, words, max_depth, results ++ [file]
-        	false -> schedule_process updated_processes, dirs, paths, words, max_depth, results
+          false -> schedule_process updated_processes, dirs, paths, words, max_depth, results
         end
     end
   end
