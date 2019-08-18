@@ -1,6 +1,11 @@
 # ExtreamSeek
 
-**TODO: Add description**
+Search for 'files containing any word' within a specified directory and below a specified depth.
+You can get binary as following.
+
+```shell
+$ mix escript.build
+```
 
 ## Installation
 
