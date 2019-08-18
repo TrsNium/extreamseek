@@ -18,7 +18,7 @@ defmodule ExtreamSeek do
         -> :help
 
       {_, [dir, word, process_num, depth], _}
-        -> { dir, word, process_num, depth }
+        -> { dir, word, String.to_integer(process_num), String.to_integer(depth) }
       _ -> :help
     end
   end

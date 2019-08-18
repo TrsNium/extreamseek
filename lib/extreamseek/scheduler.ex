@@ -20,7 +20,8 @@ defmodule ExtreamSeek.Scheduler do
         {target_path, other_paths} = List.pop_at(paths, 0)
         updated_processes = ExtreamSeek.Process.update_process(pid, processes, :execute)
         send pid, {:seek_in_file, target_path, words}
-        schedule_process updated_processes, dirs, other_paths, words, max_depth, results {:ready, pid} ->
+        schedule_process updated_processes, dirs, other_paths, words, max_depth, results
+      {:ready, pid} ->
         case ExtreamSeek.Process.is_all_completed(processes) do
           true ->
             send pid, :shutdown
