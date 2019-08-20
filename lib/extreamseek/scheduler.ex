@@ -14,7 +14,7 @@ defmodule ExtreamSeek.Scheduler do
       {:ready, pid} when dirs != [] ->
         {target_dir, other_dirs} = List.pop_at(dirs, 0)
         updated_processes = ExtreamSeek.Process.update_process(pid, processes, :execute)
-        send pid, {:seek_in_dir, target_dir}
+        send pid, {:seek_in_dir, target_dir, max_depth}
         schedule_process updated_processes, other_dirs, paths, words, max_depth, results
       {:ready, pid} when paths != [] ->
         {target_path, other_paths} = List.pop_at(paths, 0)
@@ -37,7 +37,7 @@ defmodule ExtreamSeek.Scheduler do
 
       # Handler when the directory has been scanned.
       {:completed_seek_in_dir, pid, new_dirs, new_paths} ->
-        updated_dirs = dirs ++ ExtreamSeek.Dir.dirs_less_than_max(new_dirs, max_depth)
+        updated_dirs = dirs ++ new_dirs
         updated_paths = paths ++ new_paths
         updated_processes = ExtreamSeek.Process.update_process(pid, processes, :completed)
         schedule_process updated_processes, updated_dirs, updated_paths, words, max_depth, results

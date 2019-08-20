@@ -5,7 +5,7 @@ defmodule ExtreamSeek do
     |> parse_args
     |> process
     |> formatter
-    |> Enum.join "\n"
+    |> Enum.join("\n")
     |> IO.puts
   end
 
