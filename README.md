@@ -1,11 +1,15 @@
 # ExtreamSeek
 
+Its' a just program to learn actor model of elixir.
+
 Search for 'files containing any word' within a specified directory and below a specified depth.
 You can get binary as following.
 
 ```shell
 $ mix escript.build
 ```
+
+
 
 ## Installation
 
